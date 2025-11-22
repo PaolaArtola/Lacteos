@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Lactería El Buen Sabor{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Productos Lácteos Frescos y de Calidad</h1>
+        <p>Desde 1995 trayendo lo mejor de la naturaleza a tu mesa</p>
+        <div class="hero-buttons">
+            <a href="#productos" class="btn btn-primary">Ver Productos</a>
+            <a href="#nosotros" class="btn btn-secondary">Conocer Más</a>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🥛</div>
+            <h3>100% Natural</h3>
+            <p>Leche fresca directo de granjas locales sin conservantes artificiales</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🧀</div>
+            <h3>Quesos Artesanales</h3>
+            <p>Elaborados con recetas tradicionales y los mejores ingredientes</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🍦</div>
+            <h3>Yogurt Cremoso</h3>
+            <p>Variedades deliciosas con cultivos probióticos beneficiosos</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🚚</div>
+            <h3>Entrega Rápida</h3>
+            <p>Llevamos frescura a tu puerta en menos de 24 horas</p>
+        </div>
+    </div>
+</section>
+
+<section id="productos" class="products">
+    <h2>Nuestros Productos Destacados</h2>
+    {% if featured_products %}
+    <div class="products-grid">
+        {% for product in featured_products %}
+        <div class="product-card">
+            <div class="product-image">{{ product.category|slice:":1"|upper }}</div>
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.description|default:"Producto de calidad"|truncatewords:15 }}</p>
+            <div class="product-info">
+                <div class="product-price">${{ product.price|floatformat:2 }}</div>
+                <div class="product-stock">Stock: {{ product.stock }} {{ product.unit }}</div>
+            </div>
+            <a href="{% url 'lacteos:product_detail' product.pk %}" class="btn btn-primary btn-sm">Ver Detalles</a>
+        </div>
+        {% endfor %}
+    </div>
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url 'lacteos:product_list' %}" class="btn btn-secondary">Ver Todos los Productos</a>
+    </div>
+    {% else %}
+    <p style="text-align: center; color: #666;">No hay productos disponibles en este momento.</p>
+    {% endif %}
+</section>
+
+<section id="nosotros" class="about">
+    <h2>Sobre Nosotros</h2>
+    <div class="about-content">
+        <div class="about-text">
+            <p>
+                Lactería El Buen Sabor es una empresa familiar dedicada a la producción y distribución 
+                de productos lácteos de la más alta calidad desde 1995. Nos especializamos en ofrecer 
+                productos frescos, naturales y nutritivos directamente desde nuestras granjas hasta su mesa.
+            </p>
+            <p>
+                Nuestro compromiso es mantener los más altos estándares de calidad, asegurando que cada 
+                producto que ofrecemos cumpla con las mejores prácticas de producción y frescura. 
+                Trabajamos directamente con productores locales para garantizar la frescura y calidad 
+                de nuestros productos.
+            </p>
+        </div>
+        <div class="about-stats">
+            <div class="stat">
+                <div class="stat-number">30+</div>
+                <div class="stat-label">Años de Experiencia</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Productos Naturales</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">5000+</div>
+                <div class="stat-label">Clientes Satisfechos</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="cta-content">
+        <h2>¿Listo para probar nuestros productos?</h2>
+        <p>Regístrate ahora y obtén 10% de descuento en tu primera compra</p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'lacteos:product_list' %}" class="btn btn-primary">Comenzar a Comprar</a>
+        {% else %}
+            <a href="{% url 'signup' %}" class="btn btn-primary">Crear Cuenta Gratis</a>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .hero {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        padding: 4rem 2rem;
+        text-align: center;
+        border-radius: 8px;
+        margin-bottom: 3rem;
+    }
+
+    .hero-content h1 {
+        font-size: 2.5rem;
+        color: #2c5f2d;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .hero-content p {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 2rem;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .features {
+        margin-bottom: 4rem;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+
+    .feature-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+        color: #2c5f2d;
+        margin-bottom: 0.5rem;
+        font-size: 1.3rem;
+    }
+
+    .feature-card p {
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .products {
+        margin-bottom: 4rem;
+    }
+
+    .products h2 {
+        text-align: center;
+        color: #2c5f2d;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 2rem;
+    }
+
+    .product-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .product-image {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .product-card h3 {
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-size: 1.3rem;
+    }
+
+    .product-card p {
+        color: #666;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+        min-height: 3rem;
+    }
+
+    .product-info {
+        margin-bottom: 1rem;
+    }
+
+    .product-price {
+        font-size: 1.5rem;
+        color: #2c5f2d;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .product-stock {
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .about {
+        background: white;
+        padding: 3rem 2rem;
+        border-radius: 8px;
+        margin-bottom: 3rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .about-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .about h2 {
+        color: #2c5f2d;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .about-text p {
+        color: #666;
+        line-height: 1.8;
+        margin-bottom: 1rem;
+    }
+
+    .about-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .stat {
+        text-align: center;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        color: #2c5f2d;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .cta {
+        background: #2c5f2d;
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .cta-content h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .cta-content p {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .cta .btn-primary {
+        background: white;
+        color: #2c5f2d;
+    }
+
+    .cta .btn-primary:hover {
+        background: #f0f0f0;
+    }
+
+    @media (max-width: 768px) {
+        .hero-content h1 {
+            font-size: 1.8rem;
+        }
+
+        .hero-content p {
+            font-size: 1rem;
+        }
+
+        .features-grid,
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .about-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

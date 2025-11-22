@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Compras - Lactería El Buen Sabor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sales-header {
+        margin-bottom: 2rem;
+    }
+
+    .sales-header h1 {
+        color: #2c5f2d;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .sales-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .sale-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .sale-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .sale-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .sale-id {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #2c5f2d;
+    }
+
+    .sale-date {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .sale-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .info-value.success {
+        color: #28a745;
+    }
+
+    .sale-items-preview {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+
+    .sale-items-preview h4 {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+
+    .items-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .item-badge {
+        padding: 0.25rem 0.75rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .no-sales {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .no-sales p {
+        color: #666;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sales-header">
+    <h1>Mis Compras</h1>
+    <p>Historial de todas tus transacciones</p>
+</div>
+
+{% if sales %}
+<div class="sales-list">
+    {% for sale in sales %}
+    <div class="sale-card">
+        <div class="sale-header">
+            <div>
+                <div class="sale-id">Venta #{{ sale.id }}</div>
+                <div class="sale-date">{{ sale.sale_date|date:"F d, Y - H:i" }}</div>
+            </div>
+            <a href="{% url 'lacteos:sale_detail' sale.pk %}" class="btn btn-primary btn-sm">
+                Ver Detalles
+            </a>
+        </div>
+
+        <div class="sale-info">
+            <div class="info-item">
+                <span class="info-label">Total</span>
+                <span class="info-value">${{ sale.total_amount|floatformat:2 }}</span>
+            </div>
+            {% if user.profile.is_admin %}
+                <div class="info-item">
+                    <span class="info-label">Ganancia</span>
+                    <span class="info-value success">${{ sale.total_profit|floatformat:2 }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">ROI</span>
+                    <span class="info-value {% if sale.roi > 0 %}success{% endif %}">
+                        {{ sale.roi|floatformat:2 }}%
+                    </span>
+                </div>
+            {% endif %}
+            {% if sale.customer_name %}
+            <div class="info-item">
+                <span class="info-label">Cliente</span>
+                <span class="info-value">{{ sale.customer_name }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="sale-items-preview">
+            <h4>Items ({{ sale.saleitem_set.count }})</h4>
+            <div class="items-list">
+                {% for item in sale.saleitem_set.all|slice:":5" %}
+                <span class="item-badge">{{ item.lacteo.name }} x{{ item.quantity }}</span>
+                {% endfor %}
+                {% if sale.saleitem_set.count > 5 %}
+                <span class="item-badge">+{{ sale.saleitem_set.count|add:"-5" }} más</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="no-sales">
+    <p>No has realizado ninguna compra aún.</p>
+    <a href="{% url 'lacteos:product_list' %}" class="btn btn-primary">Ver Productos</a>
+</div>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Usuario - Lactería El Buen Sabor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .delete-container h1 {
+        color: #dc3545;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .warning-box {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 1.5rem;
+        border-radius: 4px;
+        margin: 2rem 0;
+        text-align: left;
+    }
+
+    .warning-box h3 {
+        color: #856404;
+        margin-bottom: 0.5rem;
+    }
+
+    .warning-box p {
+        color: #856404;
+        margin: 0;
+    }
+
+    .user-info {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 2rem 0;
+        text-align: left;
+    }
+
+    .user-info p {
+        margin: 0.5rem 0;
+        color: #333;
+    }
+
+    .user-info strong {
+        color: #2c5f2d;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <h1>Eliminar Usuario</h1>
+    <p style="color: #666; margin-bottom: 2rem;">¿Estás seguro de que deseas eliminar este usuario?</p>
+
+    <div class="warning-box">
+        <h3>Advertencia</h3>
+        <p>Esta acción no se puede deshacer. Todos los datos asociados a este usuario serán eliminados permanentemente.</p>
+    </div>
+
+    <div class="user-info">
+        <p><strong>Usuario:</strong> {{ user_obj.username }}</p>
+        <p><strong>Email:</strong> {{ user_obj.email|default:"-" }}</p>
+        <p><strong>Nombre:</strong> {{ user_obj.get_full_name|default:"-" }}</p>
+        {% if user_obj.profile %}
+        <p><strong>Rol:</strong> {{ user_obj.profile.get_role_display }}</p>
+        {% endif %}
+        <p><strong>Fecha de Registro:</strong> {{ user_obj.date_joined|date:"F d, Y" }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn" style="background: #dc3545; color: white;">Sí, Eliminar</button>
+            <a href="{% url 'lacteos:user_management' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

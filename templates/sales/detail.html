@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Venta #{{ sale.id }} - Lactería El Buen Sabor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sale-detail-header {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .sale-detail-header h1 {
+        color: #2c5f2d;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .sale-info-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .sale-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .info-box {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border-left: 4px solid #2c5f2d;
+    }
+
+    .info-box h3 {
+        font-size: 0.85rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-box .value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c5f2d;
+    }
+
+    .info-box.success {
+        border-left-color: #28a745;
+    }
+
+    .info-box.success .value {
+        color: #28a745;
+    }
+
+    .items-table {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .items-table h2 {
+        color: #2c5f2d;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #555;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .text-success {
+        color: #28a745;
+    }
+
+    .total-row {
+        font-weight: 700;
+        font-size: 1.1rem;
+        background: #f8f9fa;
+    }
+
+    .total-row td {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sale-detail-header">
+    <div>
+        <h1>Venta #{{ sale.id }}</h1>
+        <p style="color: #666;">{{ sale.sale_date|date:"F d, Y - H:i" }}</p>
+    </div>
+    <div>
+        <a href="{% url 'lacteos:my_sales' %}" class="btn btn-secondary">Volver a Mis Compras</a>
+    </div>
+</div>
+
+<div class="sale-info-card">
+    <h2 style="color: #2c5f2d; margin-bottom: 1rem;">Información de la Venta</h2>
+    
+    {% if sale.customer_name %}
+    <p><strong>Cliente:</strong> {{ sale.customer_name }}</p>
+    {% endif %}
+    
+    {% if sale.notes %}
+    <p><strong>Notas:</strong> {{ sale.notes }}</p>
+    {% endif %}
+    
+    <p><strong>Creada por:</strong> {{ sale.created_by.username|default:"Sistema" }}</p>
+
+    <div class="sale-info-grid">
+        <div class="info-box">
+            <h3>Total {% if user.profile.is_admin %} de Venta{% endif %}</h3>
+            <div class="value">${{ sale.total_amount|floatformat:2 }}</div>
+        </div>
+        {% if user.profile.is_admin %}
+            <div class="info-box">
+                <h3>Costo Total</h3>
+                <div class="value">${{ sale.total_cost|floatformat:2 }}</div>
+            </div>
+            <div class="info-box success">
+                <h3>Ganancia</h3>
+                <div class="value">${{ sale.total_profit|floatformat:2 }}</div>
+            </div>
+            <div class="info-box success">
+                <h3>ROI</h3>
+                <div class="value">{{ sale.roi|floatformat:2 }}%</div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="items-table">
+    <h2>Items de la Venta</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                {% if user.profile.is_admin %}
+                    <th>Costo Unitario</th>
+                {% endif %}
+                <th>Subtotal</th>
+                {% if user.profile.is_admin %}
+                    <th>Ganancia</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>
+                    <strong>{{ item.lacteo.name }}</strong><br>
+                    <small style="color: #666;">{{ item.lacteo.category }}</small>
+                </td>
+                <td>{{ item.quantity }} {{ item.lacteo.unit }}</td>
+                <td class="text-right">${{ item.unit_price|floatformat:2 }}</td>
+                {% if user.profile.is_admin %}
+                    <td class="text-right">${{ item.cost_price|floatformat:2 }}</td>
+                {% endif %}
+                <td class="text-right">${{ item.subtotal|floatformat:2 }}</td>
+                {% if user.profile.is_admin %}
+                    <td class="text-right text-success">${{ item.profit|floatformat:2 }}</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td colspan="{% if user.profile.is_admin %}4{% else %}3{% endif %}"><strong>TOTALES</strong></td>
+                <td class="text-right"><strong>${{ sale.total_amount|floatformat:2 }}</strong></td>
+                {% if user.profile.is_admin %}
+                <td class="text-right text-success"><strong>${{ sale.total_profit|floatformat:2 }}</strong></td>
+                {% endif %}
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+

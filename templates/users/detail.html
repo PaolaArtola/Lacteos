@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Usuario - Lactería El Buen Sabor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .user-form-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .form-header h1 {
+        color: #2c5f2d;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section h2 {
+        color: #2c5f2d;
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-family: inherit;
+    }
+
+    .form-group input[type="checkbox"] {
+        width: auto;
+        margin-right: 0.5rem;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #f0f0f0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="user-form-container">
+    <div class="form-header">
+        <h1>Editar Usuario</h1>
+        <p>Gestiona la información y permisos del usuario</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h2>Información Básica</h2>
+            
+            <div class="form-group">
+                <label for="username">Nombre de Usuario</label>
+                <input type="text" id="username" name="username" value="{{ user_obj.username }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ user_obj.email }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="first_name">Nombre</label>
+                <input type="text" id="first_name" name="first_name" value="{{ user_obj.first_name }}">
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">Apellido</label>
+                <input type="text" id="last_name" name="last_name" value="{{ user_obj.last_name }}">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Perfil y Rol</h2>
+            
+            <div class="form-group">
+                <label for="role">Rol</label>
+                <select id="role" name="role" required>
+                    {% for value, label in role_choices %}
+                    <option value="{{ value }}" {% if profile.role == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Teléfono</label>
+                <input type="text" id="phone" name="phone" value="{{ profile.phone }}">
+            </div>
+
+            <div class="form-group">
+                <label for="address">Dirección</label>
+                <textarea id="address" name="address" rows="3">{{ profile.address }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Permisos y Estado</h2>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="is_active" name="is_active" {% if user_obj.is_active %}checked{% endif %}>
+                    <label for="is_active">Usuario Activo</label>
+                </div>
+                <small style="color: #666; display: block; margin-top: 0.25rem;">Los usuarios inactivos no pueden iniciar sesión</small>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="is_staff" name="is_staff" {% if user_obj.is_staff %}checked{% endif %}>
+                    <label for="is_staff">Acceso al Panel de Administración</label>
+                </div>
+                <small style="color: #666; display: block; margin-top: 0.25rem;">Permite acceso al panel de administración de Django</small>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            <a href="{% url 'lacteos:user_management' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

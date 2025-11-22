@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Lactería El Buen Sabor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-detail {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .product-image-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .product-image-large {
+        font-size: 8rem;
+        margin-bottom: 1rem;
+    }
+
+    .product-info-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .product-category {
+        font-size: 0.9rem;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-name {
+        color: #2c5f2d;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .product-price-large {
+        font-size: 2.5rem;
+        color: #2c5f2d;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .product-details {
+        margin: 1.5rem 0;
+        padding: 1.5rem 0;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+    }
+
+    .detail-label {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: #333;
+    }
+
+    .product-description {
+        color: #666;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+    }
+
+    .purchase-section {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #eee;
+    }
+
+    .quantity-selector {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .quantity-selector input {
+        width: 100px;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+    .stock-warning {
+        padding: 0.75rem;
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        color: #856404;
+    }
+
+    .stock-danger {
+        background: #f8d7da;
+        border-left-color: #dc3545;
+        color: #721c24;
+    }
+
+    @media (max-width: 768px) {
+        .product-detail {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail">
+    <div class="product-image-section">
+        <div class="product-image-large">{{ product.category|slice:":1"|upper }}</div>
+        <div class="product-category">{{ product.category }}</div>
+    </div>
+
+    <div class="product-info-section">
+        <div class="product-category">{{ product.category }}</div>
+        <h1 class="product-name">{{ product.name }}</h1>
+        <div class="product-price-large">${{ product.price|floatformat:2 }}</div>
+
+        <div class="product-description">
+            {{ product.description|default:"Producto de calidad premium." }}
+        </div>
+
+        <div class="product-details">
+            <div class="detail-row">
+                <span class="detail-label">Stock disponible:</span>
+                <span class="detail-value {% if product.stock < 10 %}text-danger{% endif %}">
+                    {{ product.stock }} {{ product.unit }}
+                </span>
+            </div>
+            {% if product.expiration_date %}
+            <div class="detail-row">
+                <span class="detail-label">Fecha de vencimiento:</span>
+                <span class="detail-value">{{ product.expiration_date|date:"F d, Y" }}</span>
+            </div>
+            {% endif %}
+            {% if product.cost_price > 0 %}
+                {% if user.profile.is_admin %}
+                <div class="detail-row">
+                    <span class="detail-label">Margen de ganancia:</span>
+                    <span class="detail-value text-success">{{ product.get_profit_margin|floatformat:2 }}%</span>
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="purchase-section">
+            {% if product.stock > 0 %}
+                {% if product.stock < 10 %}
+                <div class="stock-warning stock-danger">
+                    Stock bajo: Solo quedan {{ product.stock }} {{ product.unit }}
+                </div>
+                {% elif product.stock < 20 %}
+                <div class="stock-warning">
+                    Stock limitado: Solo quedan {{ product.stock }} {{ product.unit }}
+                </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'lacteos:create_sale' %}">
+                    {% csrf_token %}
+                    <div class="quantity-selector">
+                        <label for="quantity">Cantidad:</label>
+                        <input type="number" id="quantity" name="quantity" min="1" max="{{ product.stock }}" value="1" required>
+                        <span>{{ product.unit }}</span>
+                    </div>
+                    <input type="hidden" name="item_id" value="{{ product.id }}">
+                    <input type="text" name="customer_name" placeholder="Nombre del cliente (opcional)" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <textarea name="notes" placeholder="Notas (opcional)" rows="2" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 4px; font-family: inherit;"></textarea>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                        Comprar Ahora - $<span id="total-price">{{ product.price|floatformat:2 }}</span>
+                    </button>
+                </form>
+
+                <script>
+                    document.getElementById('quantity').addEventListener('input', function() {
+                        const qty = parseInt(this.value) || 1;
+                        const price = {{ product.price }};
+                        const total = (qty * price).toFixed(2);
+                        document.getElementById('total-price').textContent = total;
+                    });
+                </script>
+            {% else %}
+                <div class="stock-warning stock-danger">
+                    Este producto no está disponible en este momento.
+                </div>
+                <button type="button" class="btn btn-secondary" disabled style="width: 100%; padding: 1rem;">
+                    Sin Stock
+                </button>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="purchase-section">
+            <p style="text-align: center; color: #666; margin-bottom: 1rem;">
+                Inicia sesión para realizar una compra
+            </p>
+            <a href="{% url 'login' %}?next={% url 'lacteos:product_detail' product.pk %}" class="btn btn-primary" style="width: 100%; padding: 1rem;">
+                Iniciar Sesión
+            </a>
+        </div>
+        {% endif %}
+
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee;">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="{% url 'lacteos:product_list' %}" class="btn btn-secondary">Volver a Productos</a>
+                {% if user.is_authenticated %}
+                    {% if user.profile.is_admin or user.profile.is_employee %}
+                        <a href="{% url 'lacteos:product_edit' product.pk %}" class="btn btn-primary">Editar Producto</a>
+                        <a href="{% url 'lacteos:product_delete' product.pk %}" class="btn" style="background: #dc3545; color: white;">Eliminar Producto</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

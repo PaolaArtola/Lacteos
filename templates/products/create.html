@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Agregar Producto - Lactería El Buen Sabor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-form-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .form-header h1 {
+        color: #2c5f2d;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section h2 {
+        color: #2c5f2d;
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-family: inherit;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 0.25rem;
+        color: #666;
+        font-size: 0.85rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #f0f0f0;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-form-container">
+    <div class="form-header">
+        <h1>Agregar Nuevo Producto</h1>
+        <p>Completa la información del producto</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h2>Información Básica</h2>
+            
+            <div class="form-group">
+                <label for="name">Nombre del Producto *</label>
+                <input type="text" id="name" name="name" required placeholder="Ej: Leche Entera">
+            </div>
+
+            <div class="form-group">
+                <label for="category">Categoría *</label>
+                <input type="text" id="category" name="category" required placeholder="Ej: Leche, Queso, Yogurt">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Descripción</label>
+                <textarea id="description" name="description" placeholder="Descripción del producto"></textarea>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Precios y Costos</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price">Precio de Venta *</label>
+                    <input type="number" id="price" name="price" step="0.01" min="0" required placeholder="0.00">
+                    <small>Precio al que se vende al cliente</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="cost_price">Precio de Costo</label>
+                    <input type="number" id="cost_price" name="cost_price" step="0.01" min="0" placeholder="0.00">
+                    <small>Precio al que se compra (para calcular ganancias)</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Inventario</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="stock">Stock Disponible *</label>
+                    <input type="number" id="stock" name="stock" min="0" required placeholder="0">
+                    <small>Cantidad disponible en inventario</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="unit">Unidad *</label>
+                    <input type="text" id="unit" name="unit" required placeholder="Ej: litro, kg, unidad">
+                    <small>Unidad de medida</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="expiration_date">Fecha de Vencimiento</label>
+                <input type="date" id="expiration_date" name="expiration_date">
+                <small>Fecha de vencimiento del producto (opcional)</small>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Crear Producto</button>
+            <a href="{% url 'lacteos:product_list' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

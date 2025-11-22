@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Producto - Lactería El Buen Sabor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .delete-container h1 {
+        color: #dc3545;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .warning-box {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 1.5rem;
+        border-radius: 4px;
+        margin: 2rem 0;
+        text-align: left;
+    }
+
+    .warning-box h3 {
+        color: #856404;
+        margin-bottom: 0.5rem;
+    }
+
+    .warning-box p {
+        color: #856404;
+        margin: 0;
+    }
+
+    .product-info {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 2rem 0;
+        text-align: left;
+    }
+
+    .product-info p {
+        margin: 0.5rem 0;
+        color: #333;
+    }
+
+    .product-info strong {
+        color: #2c5f2d;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <h1>Eliminar Producto</h1>
+    <p style="color: #666; margin-bottom: 2rem;">¿Estás seguro de que deseas eliminar este producto?</p>
+
+    <div class="warning-box">
+        <h3>Advertencia</h3>
+        <p>Esta acción no se puede deshacer. El producto será eliminado permanentemente del sistema.</p>
+    </div>
+
+    <div class="product-info">
+        <p><strong>Nombre:</strong> {{ product.name }}</p>
+        <p><strong>Categoría:</strong> {{ product.category }}</p>
+        <p><strong>Precio:</strong> ${{ product.price|floatformat:2 }}</p>
+        <p><strong>Stock:</strong> {{ product.stock }} {{ product.unit }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn" style="background: #dc3545; color: white;">Sí, Eliminar</button>
+            <a href="{% url 'lacteos:product_detail' product.pk %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
