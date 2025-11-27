@@ -31,6 +31,7 @@
             margin: 0 auto;
             padding: 1rem 2rem;
             display: flex;
+            gap: 1rem;
             justify-content: space-between;
             align-items: center;
         }
@@ -40,13 +41,16 @@
             font-weight: 700;
             color: #2c5f2d;
             text-decoration: none;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 1rem;
             list-style: none;
             align-items: center;
+            flex-wrap: nowrap;
         }
 
         .nav-links a {
@@ -54,6 +58,40 @@
             color: #555;
             font-weight: 500;
             transition: color 0.2s;
+            white-space: nowrap;
+        }
+
+        .nav-links li {
+            white-space: nowrap;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+            padding: 8px;
+            z-index: 201;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: #2c5f2d;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
         }
 
         .btn {
@@ -65,6 +103,7 @@
             border: none;
             cursor: pointer;
             display: inline-block;
+            white-space: nowrap;
         }
 
         .btn-primary {
@@ -154,6 +193,7 @@
             cursor: pointer;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .cmain-btn:hover {
@@ -178,11 +218,12 @@
             cursor: pointer;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .csec-btn:hover {
             background: white;
-            color: #fff;
+            color: #333;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
@@ -201,21 +242,88 @@
             color: #666;
             cursor: pointer;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            white-space: nowrap;
         }
 
-        @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 1rem;
+        .rounded-border-btn {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 12px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .rounded-border-btn:hover {
+            background: #f8f8f8;
+            transform: translateY(-1px);
+        }
+
+        .rounded-border-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (
+        {% if user.is_authenticated %}
+            {% if user.profile.is_admin %}
+            max-width: 1200px
+            {% else %}
+            max-width: 1000px
+            {% endif %}
+        {% else %}
+            max-width: 900px
+        {% endif %}
+        
+        ) {
+            .hamburger {
+                display: flex;
             }
 
             .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 280px;
+                background-color: #fff;
                 flex-direction: column;
-                gap: 1rem;
+                padding: 5rem 2rem 2rem;
+                box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+                transition: right 0.3s ease;
+                gap: 1.5rem;
+                align-items: flex-start;
+                overflow-y: auto;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links li {
+                width: 100%;
+            }
+
+            .nav-links a {
+                display: block;
+                width: 100%;
+            }
+
+            .nav-links .btn,
+            .nav-links .rounded-border-btn {
+                width: 100%;
+                text-align: center;
             }
 
             .main-content {
                 padding: 1rem;
+            }
+
+            .messages {
+                padding: 0 1rem;
             }
         }
     </style>
@@ -225,7 +333,14 @@
     <header class="header">
         <nav class="nav-container">
             <a href="{% url 'home' %}" class="logo">Lactería El Buen Sabor</a>
-            <ul class="nav-links">
+            
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <ul class="nav-links" id="navLinks">
                 <li><a href="{% url 'home' %}">Inicio</a></li>
                 <li><a href="{% url 'lacteos:product_list' %}">Productos</a></li>
                 <li><a href="{% url 'home' %}#nosotros">Nosotros</a></li>
@@ -241,9 +356,9 @@
                     {% endif %}
                     <li><a href="{% url 'lacteos:my_sales' %}">Mis Compras</a></li>
                     <li><a href="#">Hola, {{ user.username }}</a></li>
-                    <li><a href="{% url 'logout' %}" class="cmain-btn">Cerrar Sesión</a></li>
+                    <li><a href="{% url 'logout' %}" class="rounded-border-btn">Cerrar Sesión</a></li>
                 {% else %}
-                    <li><a href="{% url 'login' %}" class="cmain-btn">Iniciar Sesión</a></li>
+                    <li><a href="{% url 'login' %}" class="rounded-border-btn">Iniciar Sesión</a></li>
                     <li><a href="{% url 'signup' %}" class="btn btn-primary">Registrarse</a></li>
                 {% endif %}
             </ul>
@@ -267,6 +382,37 @@
     <footer class="footer">
         <p>&copy; 2025 Lactería El Buen Sabor - Productos frescos y de calidad</p>
     </footer>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const hamburger = document.querySelector('.hamburger');
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navLinks = document.getElementById('navLinks');
+            const hamburger = document.querySelector('.hamburger');
+            const isClickInside = navLinks.contains(event.target) || hamburger.contains(event.target);
+            
+            if (!isClickInside && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                hamburger.classList.remove('active');
+            }
+        });
+
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const navLinks = document.getElementById('navLinks');
+                const hamburger = document.querySelector('.hamburger');
+                navLinks.classList.remove('active');
+                hamburger.classList.remove('active');
+            });
+        });
+    </script>
 
     {% block extra_js %}{% endblock %}
 </body>
