@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block title %}Gestión de Usuarios - Lactería El Buen Sabor{% endblock %}
 
@@ -175,7 +176,10 @@
                         <span class="badge badge-inactive">Inactivo</span>
                     {% endif %}
                 </td>
-                <td>{{ user.date_joined|date:"M d, Y" }}</td>
+
+                {% timezone "America/Lima" %}
+                    <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                {% endtimezone %}
                 <td>
                     <div class="action-buttons">
                         <a href="{% url 'lacteos:user_detail' user.pk %}" class="btn btn-primary btn-sm">Editar</a>

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block title %}Dashboard - Lactería El Buen Sabor{% endblock %}
 
@@ -276,7 +277,10 @@
     <div class="chart-container">
         {% for day in sales_by_day %}
         <div class="chart-bar">
-            <div class="chart-bar-label">{{ day.date|date:"D, M d" }}</div>
+
+            {% timezone "America/Lima" %}
+                <div class="chart-bar-label">{{ day.date|date:"D, M d" }}</div>
+            {% endtimezone %}
             <div class="chart-bar-visual">
                 {% if max_revenue > 0 %}
                     {% widthratio day.revenue max_revenue 100 as width %}
@@ -311,7 +315,9 @@
             {% for sale in latest_sales %}
             <tr>
                 <td>#{{ sale.id }}</td>
-                <td>{{ sale.sale_date|date:"d M Y H:i" }}</td>
+                {% timezone "America/Lima" %}
+                    <td>{{ sale.sale_date|date:"d M Y H:i" }}</td>
+                {% endtimezone %}
                 <td>{{ sale.customer_name|default:"Cliente sin nombre" }}</td>
                 <td class="text-right">${{ sale.total_amount|floatformat:2 }}</td>
                 <td class="text-right text-success">${{ sale.total_profit|floatformat:2 }}</td>

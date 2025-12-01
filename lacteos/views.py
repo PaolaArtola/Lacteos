@@ -368,6 +368,11 @@ def product_create(request):
                 expiration_date=expiration_date if expiration_date else None,
                 description=description
             )
+
+            if 'imagen' in request.FILES:
+                product.imagen = request.FILES['imagen']
+
+            product.save()
             messages.success(request, f'Producto "{product.name}" creado exitosamente.')
             return redirect('lacteos:product_detail', pk=product.pk)
         except (ValueError, Exception) as e:
@@ -405,6 +410,10 @@ def product_edit(request, pk):
             product.unit = unit
             product.expiration_date = expiration_date if expiration_date else None
             product.description = description
+
+            if 'imagen' in request.FILES:
+                product.imagen = request.FILES['imagen']
+            
             product.save()
             
             messages.success(request, f'Producto "{product.name}" actualizado exitosamente.')

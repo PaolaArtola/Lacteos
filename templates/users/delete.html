@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block title %}Eliminar Usuario - Lactería El Buen Sabor{% endblock %}
 
@@ -82,7 +83,10 @@
         {% if user_obj.profile %}
         <p><strong>Rol:</strong> {{ user_obj.profile.get_role_display }}</p>
         {% endif %}
-        <p><strong>Fecha de Registro:</strong> {{ user_obj.date_joined|date:"F d, Y" }}</p>
+
+        {% timezone "America/Lima" %}
+            <p><strong>Fecha de Registro:</strong> {{ user_obj.date_joined|date:"F d, Y" }}</p>
+        {% endtimezone %}
     </div>
 
     <form method="post">

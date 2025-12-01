@@ -15,6 +15,7 @@ class Lacteo(models.Model):
     expiration_date = models.DateField()
     description = models.TextField(blank=True)
     cost_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Purchase cost per unit")
+    imagen = models.ImageField(upload_to='productos/', null=True, default=None)
 
     def __str__(self):
         return self.name

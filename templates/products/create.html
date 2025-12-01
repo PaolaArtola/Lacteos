@@ -100,9 +100,24 @@
         <p>Completa la información del producto</p>
     </div>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         
+        <div class="form-section">
+            <h2>Imagen del Producto</h2>
+
+            {% if product.imagen %}
+                <div style="margin-bottom:1rem;">
+                    <img src="{{ product.imagen.url }}" alt="Imagen actual" style="max-width:150px; border-radius:6px;">
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="imagen">Cambiar Imagen</label>
+                <input type="file" id="imagen" name="imagen" accept="image/*">
+            </div>
+        </div>
+
         <div class="form-section">
             <h2>Información Básica</h2>
             

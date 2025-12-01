@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block title %}Venta #{{ sale.id }} - Lactería El Buen Sabor{% endblock %}
 
@@ -131,7 +132,9 @@
 <div class="sale-detail-header">
     <div>
         <h1>Venta #{{ sale.id }}</h1>
-        <p style="color: #666;">{{ sale.sale_date|date:"F d, Y - H:i" }}</p>
+        {% timezone "America/Lima" %}
+            <p style="color: #666;">{{ sale.sale_date|date:"F d, Y - H:i" }}</p>
+        {% endtimezone %}
     </div>
     <div>
         <a href="{% url 'lacteos:my_sales' %}" class="btn btn-secondary">Volver a Mis Compras</a>

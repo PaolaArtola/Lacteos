@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block title %}Productos - Lactería El Buen Sabor{% endblock %}
 
@@ -410,6 +411,14 @@
             {% for product in products %}
             <div class="product-card">
                 <div class="product-category">{{ product.category }}</div>
+
+                {% if product.imagen %}
+                    <div style="margin-bottom:1rem;">
+                        <img src="{{ product.imagen.url }}" alt="Imagen actual" style="max-width:250px; border-radius:6px;">
+                    </div>
+                {% else %}
+                    <div class="product-image">{{ product.category|slice:":1"|upper }}</div>
+                {% endif %}
                 <h3>{{ product.name }}</h3>
                 <p>{{ product.description|default:"Producto de calidad"|truncatewords:20 }}</p>
                 <div class="product-info">
@@ -418,7 +427,9 @@
                         Stock: {{ product.stock }} {{ product.unit }}
                     </div>
                     {% if product.expiration_date %}
-                    <div class="product-stock">📅 Vence: {{ product.expiration_date|date:"M d, Y" }}</div>
+                    {% timezone "America/Lima" %}
+                        <div class="product-stock">📅 Vence: {{ product.expiration_date|date:"M d, Y" }}</div>
+                    {% endtimezone %}
                     {% endif %}
                 </div>
                 <div class="purchase-form">

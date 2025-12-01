@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block title %}{{ product.name }} - Lactería El Buen Sabor{% endblock %}
 
@@ -128,7 +129,12 @@
 {% block content %}
 <div class="product-detail">
     <div class="product-image-section">
-        <div class="product-image-large">{{ product.category|slice:":1"|upper }}</div>
+
+        {% if product.imagen %}
+            <div style="margin-bottom:1rem;">
+                <img src="{{ product.imagen.url }}" alt="Imagen actual" style="max-width:150px; border-radius:6px;">
+            </div>
+        {% endif %}
         <div class="product-category">{{ product.category }}</div>
     </div>
 
@@ -151,7 +157,9 @@
             {% if product.expiration_date %}
             <div class="detail-row">
                 <span class="detail-label">Fecha de vencimiento:</span>
-                <span class="detail-value">{{ product.expiration_date|date:"F d, Y" }}</span>
+                {% timezone "America/Lima" %}
+                    <span class="detail-value">{{ product.expiration_date|date:"F d, Y" }}</span>
+                {% endtimezone %}
             </div>
             {% endif %}
             {% if product.cost_price > 0 %}

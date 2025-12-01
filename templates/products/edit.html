@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block title %}Editar Producto - Lactería El Buen Sabor{% endblock %}
 
@@ -100,9 +101,23 @@
         <p>Modifica la información del producto</p>
     </div>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        
+        <div class="form-section">
+            <h2>Imagen del Producto</h2>
+
+            {% if product.imagen %}
+                <div style="margin-bottom:1rem;">
+                    <img src="{{ product.imagen.url }}" alt="Imagen actual" style="max-width:150px; border-radius:6px;">
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="imagen">Cambiar Imagen</label>
+                <input type="file" id="imagen" name="imagen" accept="image/*">
+            </div>
+        </div>
+
         <div class="form-section">
             <h2>Información Básica</h2>
             
@@ -159,7 +174,9 @@
 
             <div class="form-group">
                 <label for="expiration_date">Fecha de Vencimiento</label>
-                <input type="date" id="expiration_date" name="expiration_date" value="{% if product.expiration_date %}{{ product.expiration_date|date:'Y-m-d' }}{% endif %}">
+                {% timezone "America/Lima" %}
+                    <input type="date" id="expiration_date" name="expiration_date" value="{% if product.expiration_date %}{{ product.expiration_date|date:'Y-m-d' }}{% endif %}">
+                {% endtimezone %}
                 <small>Fecha de vencimiento del producto (opcional)</small>
             </div>
         </div>

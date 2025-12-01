@@ -45,7 +45,14 @@
     <div class="products-grid">
         {% for product in featured_products %}
         <div class="product-card">
-            <div class="product-image">{{ product.category|slice:":1"|upper }}</div>
+
+            {% if product.imagen %}
+                <div style="margin-bottom:1rem;">
+                    <img src="{{ product.imagen.url }}" alt="Imagen actual" style="max-width:250px; border-radius:6px;">
+                </div>
+            {% else %}
+                <div class="product-image">{{ product.category|slice:":1"|upper }}</div>
+            {% endif %}
             <h3>{{ product.name }}</h3>
             <p>{{ product.description|default:"Producto de calidad"|truncatewords:15 }}</p>
             <div class="product-info">
